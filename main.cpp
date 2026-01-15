@@ -28,35 +28,13 @@ void setupConsoleEncoding() {
     SetConsoleCP(936);
 }
 
-// 显示主菜单
-void showMainMenu() {
-    system("cls");
-    cout << "=================== Git 上传工具 ===================" << endl;
-    cout << "                主菜单" << endl;
-    cout << "===================================================" << endl;
-    cout << "  [1] 执行Git上传操作" << endl;
-    cout << "  [2] 重新配置Git信息" << endl;
-    cout << "  [0] 退出程序" << endl;
-    cout << "===================================================" << endl;
-    cout << "\n请选择操作 (0-2): ";
-}
-
-// 显示配置菜单
-void showConfigMenu() {
-    system("cls");
-    cout << "=================== Git 配置工具 ===================" << endl;
-    cout << "                重新配置Git信息" << endl;
-    cout << "===================================================" << endl;
-    cout << "按任意键继续配置，或按ESC返回主菜单..." << endl;
-}
-
-// 显示键位提示（保留原功能）
+// 显示键位提示
 void showKeyInstructions() {
     system("cls");
     cout << "=================== Git 上传工具 ===================" << endl;
-    cout << "                上传确认" << endl;
+    cout << "按 ESC 键: 退出程序" << endl;
+    cout << "按 回车键: 执行Git上传操作" << endl;
     cout << "===================================================" << endl;
-    cout << "即将执行Git上传操作，按回车键继续，ESC返回主菜单..." << endl;
     cout << "\n等待按键...";
 }
 
@@ -75,20 +53,11 @@ void createConfigFile() {
 
     // 获取PowerShell/Git路径
     cout << "请输入PowerShell/Git的安装目录（例如：C:\\Program Files\\Git\\bin）：" << endl;
-    cout << "（如果已在系统PATH中，可直接按回车）: ";
     getline(cin, config.powershellPath);
 
     // 获取Git仓库URL
-    cout << "请输入Git仓库上传网址：";
+    cout << "请输入Git仓库上传网址：" << endl;
     getline(cin, config.gitRepoUrl);
-
-    // 验证输入
-    if (config.gitRepoUrl.empty()) {
-        cout << "错误：仓库网址不能为空！" << endl;
-        cout << "按任意键重新输入..." << endl;
-        _getch();
-        return;
-    }
 
     // 写入配置文件
     ofstream configFile(CONFIG_FILE);
@@ -104,49 +73,6 @@ void createConfigFile() {
     }
 
     cout << "配置完成！按任意键继续..." << endl;
-    _getch();
-}
-
-// 重新配置Git信息
-void reconfigureGitInfo() {
-    system("cls");
-    cout << "=================== 重新配置Git信息 ===================" << endl;
-
-    Config config;
-
-    // 获取PowerShell/Git路径
-    cout << "请输入PowerShell/Git的安装目录（例如：C:\\Program Files\\Git\\bin）：" << endl;
-    cout << "（如果已在系统PATH中，可直接按回车）: ";
-    getline(cin, config.powershellPath);
-
-    // 获取Git仓库URL
-    cout << "请输入Git仓库上传网址：";
-    getline(cin, config.gitRepoUrl);
-
-    // 验证输入
-    if (config.gitRepoUrl.empty()) {
-        cout << "错误：仓库网址不能为空！" << endl;
-        cout << "按任意键返回主菜单..." << endl;
-        _getch();
-        return;
-    }
-
-    // 写入配置文件
-    ofstream configFile(CONFIG_FILE);
-    if (configFile.is_open()) {
-        configFile << "powershell_path=" << config.powershellPath << endl;
-        configFile << "git_repo_url=" << config.gitRepoUrl << endl;
-        configFile.close();
-        cout << "配置文件已更新: " << CONFIG_FILE << endl;
-    }
-    else {
-        cerr << "错误：无法更新配置文件！" << endl;
-        cout << "按任意键返回主菜单..." << endl;
-        _getch();
-        return;
-    }
-
-    cout << "配置更新完成！按任意键返回主菜单..." << endl;
     _getch();
 }
 
@@ -178,19 +104,6 @@ Config readConfigFile() {
 
     configFile.close();
     return config;
-}
-
-// 显示当前配置
-void showCurrentConfig(const Config& config) {
-    cout << "=================== 当前配置 ===================" << endl;
-    if (config.powershellPath.empty()) {
-        cout << "Git路径: 使用系统PATH" << endl;
-    }
-    else {
-        cout << "Git路径: " << config.powershellPath << endl;
-    }
-    cout << "仓库网址: " << config.gitRepoUrl << endl;
-    cout << "================================================" << endl;
 }
 
 // 创建批处理文件（使用英文提示，避免编码问题）
@@ -264,20 +177,6 @@ void createBatchFile(const Config& config) {
 
 // 执行批处理文件并捕获输出
 void executeGitCommands(const Config& config) {
-    // 显示当前配置
-    system("cls");
-    cout << "=================== 准备上传 ===================" << endl;
-    showCurrentConfig(config);
-
-    // 确认上传
-    cout << "确认使用以上配置执行上传操作吗？" << endl;
-    cout << "按回车键继续，ESC返回主菜单..." << endl;
-
-    int key = _getch();
-    if (key == 27) { // ESC键
-        return;
-    }
-
     // 创建批处理文件
     createBatchFile(config);
 
@@ -310,34 +209,19 @@ int main() {
 
     // 主循环
     while (true) {
-        showMainMenu();
+        showKeyInstructions();
 
-        // 等待用户输入
-        char choice;
-        cin >> choice;
-        cin.ignore(); // 清除输入缓冲区
+        // 等待按键
+        int key = _getch();
 
-        // 处理用户选择
-        switch (choice) {
-        case '1': // 执行Git上传
+        // 处理按键
+        if (key == 27) { // ESC键
+            cout << "\n\n程序退出。" << endl;
+            break;
+        }
+        else if (key == 13) { // 回车键
+            cout << "\n\n开始执行Git上传操作..." << endl;
             executeGitCommands(config);
-            break;
-
-        case '2': // 重新配置
-            reconfigureGitInfo();
-            // 重新读取配置
-            config = readConfigFile();
-            break;
-
-        case '0': // 退出程序
-            cout << "\n程序退出。" << endl;
-            return 0;
-
-        default: // 无效输入
-            cout << "\n无效选择，请重新输入！" << endl;
-            cout << "按任意键继续..." << endl;
-            _getch();
-            break;
         }
     }
 
