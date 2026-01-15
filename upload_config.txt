@@ -1,0 +1,2 @@
+powershell_path=
+git_repo_url=
