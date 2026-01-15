@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <fstream>
 #include <string>
 #include <windows.h>
@@ -10,154 +10,154 @@
 
 using namespace std;
 
-// ÅäÖÃÎÄ¼şÂ·¾¶
+// é…ç½®æ–‡ä»¶è·¯å¾„
 const string CONFIG_FILE = "upload_config.txt";
-// ÁÙÊ±Åú´¦ÀíÎÄ¼şÂ·¾¶
+// ä¸´æ—¶æ‰¹å¤„ç†æ–‡ä»¶è·¯å¾„
 const string BATCH_FILE = "git_upload.bat";
 
-// ÅäÖÃ½á¹¹Ìå
+// é…ç½®ç»“æ„ä½“
 struct Config {
     string powershellPath;
     string gitRepoUrl;
 };
 
-// ÉèÖÃ¿ØÖÆÌ¨±àÂë£¨ĞŞ¸´ÖĞÎÄÏÔÊ¾ÎÊÌâ£©
+// è®¾ç½®æ§åˆ¶å°ç¼–ç ï¼ˆä¿®å¤ä¸­æ–‡æ˜¾ç¤ºé—®é¢˜ï¼‰
 void setupConsoleEncoding() {
-    // ÉèÖÃ¿ØÖÆÌ¨Êä³ö±àÂëÎªGBK£¨¼òÌåÖĞÎÄWindowsÄ¬ÈÏ±àÂë£©
+    // è®¾ç½®æ§åˆ¶å°è¾“å‡ºç¼–ç ä¸ºGBKï¼ˆç®€ä½“ä¸­æ–‡Windowsé»˜è®¤ç¼–ç ï¼‰
     SetConsoleOutputCP(936);
     SetConsoleCP(936);
 }
 
-// ÏÔÊ¾Ö÷²Ëµ¥
+// æ˜¾ç¤ºä¸»èœå•
 void showMainMenu() {
     system("cls");
-    cout << "=================== Git ÉÏ´«¹¤¾ß ===================" << endl;
-    cout << "                Ö÷²Ëµ¥" << endl;
+    cout << "=================== Git ä¸Šä¼ å·¥å…· ===================" << endl;
+    cout << "                ä¸»èœå•" << endl;
     cout << "===================================================" << endl;
-    cout << "  [1] Ö´ĞĞGitÉÏ´«²Ù×÷" << endl;
-    cout << "  [2] ÖØĞÂÅäÖÃGitĞÅÏ¢" << endl;
-    cout << "  [0] ÍË³ö³ÌĞò" << endl;
+    cout << "  [1] æ‰§è¡ŒGitä¸Šä¼ æ“ä½œ" << endl;
+    cout << "  [2] é‡æ–°é…ç½®Gitä¿¡æ¯" << endl;
+    cout << "  [0] é€€å‡ºç¨‹åº" << endl;
     cout << "===================================================" << endl;
-    cout << "\nÇëÑ¡Ôñ²Ù×÷ (0-2): ";
+    cout << "\nè¯·é€‰æ‹©æ“ä½œ (0-2): ";
 }
 
-// ÏÔÊ¾ÅäÖÃ²Ëµ¥
+// æ˜¾ç¤ºé…ç½®èœå•
 void showConfigMenu() {
     system("cls");
-    cout << "=================== Git ÅäÖÃ¹¤¾ß ===================" << endl;
-    cout << "                ÖØĞÂÅäÖÃGitĞÅÏ¢" << endl;
+    cout << "=================== Git é…ç½®å·¥å…· ===================" << endl;
+    cout << "                é‡æ–°é…ç½®Gitä¿¡æ¯" << endl;
     cout << "===================================================" << endl;
-    cout << "°´ÈÎÒâ¼ü¼ÌĞøÅäÖÃ£¬»ò°´ESC·µ»ØÖ÷²Ëµ¥..." << endl;
+    cout << "æŒ‰ä»»æ„é”®ç»§ç»­é…ç½®ï¼Œæˆ–æŒ‰ESCè¿”å›ä¸»èœå•..." << endl;
 }
 
-// ÏÔÊ¾¼üÎ»ÌáÊ¾£¨±£ÁôÔ­¹¦ÄÜ£©
+// æ˜¾ç¤ºé”®ä½æç¤ºï¼ˆä¿ç•™åŸåŠŸèƒ½ï¼‰
 void showKeyInstructions() {
     system("cls");
-    cout << "=================== Git ÉÏ´«¹¤¾ß ===================" << endl;
-    cout << "                ÉÏ´«È·ÈÏ" << endl;
+    cout << "=================== Git ä¸Šä¼ å·¥å…· ===================" << endl;
+    cout << "                ä¸Šä¼ ç¡®è®¤" << endl;
     cout << "===================================================" << endl;
-    cout << "¼´½«Ö´ĞĞGitÉÏ´«²Ù×÷£¬°´»Ø³µ¼ü¼ÌĞø£¬ESC·µ»ØÖ÷²Ëµ¥..." << endl;
-    cout << "\nµÈ´ı°´¼ü...";
+    cout << "å³å°†æ‰§è¡ŒGitä¸Šä¼ æ“ä½œï¼ŒæŒ‰å›è½¦é”®ç»§ç»­ï¼ŒESCè¿”å›ä¸»èœå•..." << endl;
+    cout << "\nç­‰å¾…æŒ‰é”®...";
 }
 
-// ¼ì²éÅäÖÃÎÄ¼şÊÇ·ñ´æÔÚ
+// æ£€æŸ¥é…ç½®æ–‡ä»¶æ˜¯å¦å­˜åœ¨
 bool configExists() {
     ifstream configFile(CONFIG_FILE);
     return configFile.good();
 }
 
-// ´´½¨²¢ÅäÖÃÅäÖÃÎÄ¼ş
+// åˆ›å»ºå¹¶é…ç½®é…ç½®æ–‡ä»¶
 void createConfigFile() {
     Config config;
 
-    cout << "Ê×´ÎÔËĞĞ£¬ĞèÒªÅäÖÃGitÉÏ´«ĞÅÏ¢" << endl;
+    cout << "é¦–æ¬¡è¿è¡Œï¼Œéœ€è¦é…ç½®Gitä¸Šä¼ ä¿¡æ¯" << endl;
     cout << "=======================================" << endl;
 
-    // »ñÈ¡PowerShell/GitÂ·¾¶
-    cout << "ÇëÊäÈëPowerShell/GitµÄ°²×°Ä¿Â¼£¨ÀıÈç£ºC:\\Program Files\\Git\\bin£©£º" << endl;
-    cout << "£¨Èç¹ûÒÑÔÚÏµÍ³PATHÖĞ£¬¿ÉÖ±½Ó°´»Ø³µ£©: ";
+    // è·å–PowerShell/Gitè·¯å¾„
+    cout << "è¯·è¾“å…¥PowerShell/Gitçš„å®‰è£…ç›®å½•ï¼ˆä¾‹å¦‚ï¼šC:\\Program Files\\Git\\binï¼‰ï¼š" << endl;
+    cout << "ï¼ˆå¦‚æœå·²åœ¨ç³»ç»ŸPATHä¸­ï¼Œå¯ç›´æ¥æŒ‰å›è½¦ï¼‰: ";
     getline(cin, config.powershellPath);
 
-    // »ñÈ¡Git²Ö¿âURL
-    cout << "ÇëÊäÈëGit²Ö¿âÉÏ´«ÍøÖ·£º";
+    // è·å–Gitä»“åº“URL
+    cout << "è¯·è¾“å…¥Gitä»“åº“ä¸Šä¼ ç½‘å€ï¼š";
     getline(cin, config.gitRepoUrl);
 
-    // ÑéÖ¤ÊäÈë
+    // éªŒè¯è¾“å…¥
     if (config.gitRepoUrl.empty()) {
-        cout << "´íÎó£º²Ö¿âÍøÖ·²»ÄÜÎª¿Õ£¡" << endl;
-        cout << "°´ÈÎÒâ¼üÖØĞÂÊäÈë..." << endl;
+        cout << "é”™è¯¯ï¼šä»“åº“ç½‘å€ä¸èƒ½ä¸ºç©ºï¼" << endl;
+        cout << "æŒ‰ä»»æ„é”®é‡æ–°è¾“å…¥..." << endl;
         _getch();
         return;
     }
 
-    // Ğ´ÈëÅäÖÃÎÄ¼ş
+    // å†™å…¥é…ç½®æ–‡ä»¶
     ofstream configFile(CONFIG_FILE);
     if (configFile.is_open()) {
         configFile << "powershell_path=" << config.powershellPath << endl;
         configFile << "git_repo_url=" << config.gitRepoUrl << endl;
         configFile.close();
-        cout << "ÅäÖÃÎÄ¼şÒÑ´´½¨: " << CONFIG_FILE << endl;
+        cout << "é…ç½®æ–‡ä»¶å·²åˆ›å»º: " << CONFIG_FILE << endl;
     }
     else {
-        cerr << "´íÎó£ºÎŞ·¨´´½¨ÅäÖÃÎÄ¼ş£¡" << endl;
+        cerr << "é”™è¯¯ï¼šæ— æ³•åˆ›å»ºé…ç½®æ–‡ä»¶ï¼" << endl;
         exit(1);
     }
 
-    cout << "ÅäÖÃÍê³É£¡°´ÈÎÒâ¼ü¼ÌĞø..." << endl;
+    cout << "é…ç½®å®Œæˆï¼æŒ‰ä»»æ„é”®ç»§ç»­..." << endl;
     _getch();
 }
 
-// ÖØĞÂÅäÖÃGitĞÅÏ¢
+// é‡æ–°é…ç½®Gitä¿¡æ¯
 void reconfigureGitInfo() {
     system("cls");
-    cout << "=================== ÖØĞÂÅäÖÃGitĞÅÏ¢ ===================" << endl;
+    cout << "=================== é‡æ–°é…ç½®Gitä¿¡æ¯ ===================" << endl;
 
     Config config;
 
-    // »ñÈ¡PowerShell/GitÂ·¾¶
-    cout << "ÇëÊäÈëPowerShell/GitµÄ°²×°Ä¿Â¼£¨ÀıÈç£ºC:\\Program Files\\Git\\bin£©£º" << endl;
-    cout << "£¨Èç¹ûÒÑÔÚÏµÍ³PATHÖĞ£¬¿ÉÖ±½Ó°´»Ø³µ£©: ";
+    // è·å–PowerShell/Gitè·¯å¾„
+    cout << "è¯·è¾“å…¥PowerShell/Gitçš„å®‰è£…ç›®å½•ï¼ˆä¾‹å¦‚ï¼šC:\\Program Files\\Git\\binï¼‰ï¼š" << endl;
+    cout << "ï¼ˆå¦‚æœå·²åœ¨ç³»ç»ŸPATHä¸­ï¼Œå¯ç›´æ¥æŒ‰å›è½¦ï¼‰: ";
     getline(cin, config.powershellPath);
 
-    // »ñÈ¡Git²Ö¿âURL
-    cout << "ÇëÊäÈëGit²Ö¿âÉÏ´«ÍøÖ·£º";
+    // è·å–Gitä»“åº“URL
+    cout << "è¯·è¾“å…¥Gitä»“åº“ä¸Šä¼ ç½‘å€ï¼š";
     getline(cin, config.gitRepoUrl);
 
-    // ÑéÖ¤ÊäÈë
+    // éªŒè¯è¾“å…¥
     if (config.gitRepoUrl.empty()) {
-        cout << "´íÎó£º²Ö¿âÍøÖ·²»ÄÜÎª¿Õ£¡" << endl;
-        cout << "°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥..." << endl;
+        cout << "é”™è¯¯ï¼šä»“åº“ç½‘å€ä¸èƒ½ä¸ºç©ºï¼" << endl;
+        cout << "æŒ‰ä»»æ„é”®è¿”å›ä¸»èœå•..." << endl;
         _getch();
         return;
     }
 
-    // Ğ´ÈëÅäÖÃÎÄ¼ş
+    // å†™å…¥é…ç½®æ–‡ä»¶
     ofstream configFile(CONFIG_FILE);
     if (configFile.is_open()) {
         configFile << "powershell_path=" << config.powershellPath << endl;
         configFile << "git_repo_url=" << config.gitRepoUrl << endl;
         configFile.close();
-        cout << "ÅäÖÃÎÄ¼şÒÑ¸üĞÂ: " << CONFIG_FILE << endl;
+        cout << "é…ç½®æ–‡ä»¶å·²æ›´æ–°: " << CONFIG_FILE << endl;
     }
     else {
-        cerr << "´íÎó£ºÎŞ·¨¸üĞÂÅäÖÃÎÄ¼ş£¡" << endl;
-        cout << "°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥..." << endl;
+        cerr << "é”™è¯¯ï¼šæ— æ³•æ›´æ–°é…ç½®æ–‡ä»¶ï¼" << endl;
+        cout << "æŒ‰ä»»æ„é”®è¿”å›ä¸»èœå•..." << endl;
         _getch();
         return;
     }
 
-    cout << "ÅäÖÃ¸üĞÂÍê³É£¡°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥..." << endl;
+    cout << "é…ç½®æ›´æ–°å®Œæˆï¼æŒ‰ä»»æ„é”®è¿”å›ä¸»èœå•..." << endl;
     _getch();
 }
 
-// ¶ÁÈ¡ÅäÖÃÎÄ¼ş
+// è¯»å–é…ç½®æ–‡ä»¶
 Config readConfigFile() {
     Config config;
     ifstream configFile(CONFIG_FILE);
     string line;
 
     if (!configFile.is_open()) {
-        cerr << "´íÎó£ºÎŞ·¨¶ÁÈ¡ÅäÖÃÎÄ¼ş£¡" << endl;
+        cerr << "é”™è¯¯ï¼šæ— æ³•è¯»å–é…ç½®æ–‡ä»¶ï¼" << endl;
         exit(1);
     }
 
@@ -180,20 +180,20 @@ Config readConfigFile() {
     return config;
 }
 
-// ÏÔÊ¾µ±Ç°ÅäÖÃ
+// æ˜¾ç¤ºå½“å‰é…ç½®
 void showCurrentConfig(const Config& config) {
-    cout << "=================== µ±Ç°ÅäÖÃ ===================" << endl;
+    cout << "=================== å½“å‰é…ç½® ===================" << endl;
     if (config.powershellPath.empty()) {
-        cout << "GitÂ·¾¶: Ê¹ÓÃÏµÍ³PATH" << endl;
+        cout << "Gitè·¯å¾„: ä½¿ç”¨ç³»ç»ŸPATH" << endl;
     }
     else {
-        cout << "GitÂ·¾¶: " << config.powershellPath << endl;
+        cout << "Gitè·¯å¾„: " << config.powershellPath << endl;
     }
-    cout << "²Ö¿âÍøÖ·: " << config.gitRepoUrl << endl;
+    cout << "ä»“åº“ç½‘å€: " << config.gitRepoUrl << endl;
     cout << "================================================" << endl;
 }
 
-// ´´½¨Åú´¦ÀíÎÄ¼ş£¨Ê¹ÓÃÓ¢ÎÄÌáÊ¾£¬±ÜÃâ±àÂëÎÊÌâ£©
+// åˆ›å»ºæ‰¹å¤„ç†æ–‡ä»¶ï¼ˆä½¿ç”¨è‹±æ–‡æç¤ºï¼Œé¿å…ç¼–ç é—®é¢˜ï¼‰
 void createBatchFile(const Config& config) {
     ofstream batchFile(BATCH_FILE);
     if (!batchFile.is_open()) {
@@ -201,20 +201,20 @@ void createBatchFile(const Config& config) {
         return;
     }
 
-    // Ğ´ÈëÅú´¦ÀíÃüÁî£¨Ê¹ÓÃÓ¢ÎÄ£©
+    // å†™å…¥æ‰¹å¤„ç†å‘½ä»¤ï¼ˆä½¿ç”¨è‹±æ–‡ï¼‰
     batchFile << "@echo off" << endl;
     batchFile << "echo =======================================" << endl;
     batchFile << "echo Git Upload Tool" << endl;
     batchFile << "echo =======================================" << endl;
     batchFile << "echo." << endl;
 
-    // ÉèÖÃGitÂ·¾¶£¨Èç¹ûÌá¹©ÁË£©
+    // è®¾ç½®Gitè·¯å¾„ï¼ˆå¦‚æœæä¾›äº†ï¼‰
     if (!config.powershellPath.empty()) {
-        // ½«Â·¾¶Ìí¼Óµ½PATH»·¾³±äÁ¿
+        // å°†è·¯å¾„æ·»åŠ åˆ°PATHç¯å¢ƒå˜é‡
         batchFile << "set PATH=" << config.powershellPath << ";%PATH%" << endl;
     }
 
-    // Ö´ĞĞGitÃüÁî
+    // æ‰§è¡ŒGitå‘½ä»¤
     batchFile << "echo [1/6] Initializing Git repository..." << endl;
     batchFile << "git init" << endl;
     batchFile << "if %errorlevel% neq 0 goto error" << endl;
@@ -262,80 +262,80 @@ void createBatchFile(const Config& config) {
     batchFile.close();
 }
 
-// Ö´ĞĞÅú´¦ÀíÎÄ¼ş²¢²¶»ñÊä³ö
+// æ‰§è¡Œæ‰¹å¤„ç†æ–‡ä»¶å¹¶æ•è·è¾“å‡º
 void executeGitCommands(const Config& config) {
-    // ÏÔÊ¾µ±Ç°ÅäÖÃ
+    // æ˜¾ç¤ºå½“å‰é…ç½®
     system("cls");
-    cout << "=================== ×¼±¸ÉÏ´« ===================" << endl;
+    cout << "=================== å‡†å¤‡ä¸Šä¼  ===================" << endl;
     showCurrentConfig(config);
 
-    // È·ÈÏÉÏ´«
-    cout << "È·ÈÏÊ¹ÓÃÒÔÉÏÅäÖÃÖ´ĞĞÉÏ´«²Ù×÷Âğ£¿" << endl;
-    cout << "°´»Ø³µ¼ü¼ÌĞø£¬ESC·µ»ØÖ÷²Ëµ¥..." << endl;
+    // ç¡®è®¤ä¸Šä¼ 
+    cout << "ç¡®è®¤ä½¿ç”¨ä»¥ä¸Šé…ç½®æ‰§è¡Œä¸Šä¼ æ“ä½œå—ï¼Ÿ" << endl;
+    cout << "æŒ‰å›è½¦é”®ç»§ç»­ï¼ŒESCè¿”å›ä¸»èœå•..." << endl;
 
     int key = _getch();
-    if (key == 27) { // ESC¼ü
+    if (key == 27) { // ESCé”®
         return;
     }
 
-    // ´´½¨Åú´¦ÀíÎÄ¼ş
+    // åˆ›å»ºæ‰¹å¤„ç†æ–‡ä»¶
     createBatchFile(config);
 
-    cout << "\nÕıÔÚÖ´ĞĞGitÉÏ´«²Ù×÷..." << endl;
+    cout << "\næ­£åœ¨æ‰§è¡ŒGitä¸Šä¼ æ“ä½œ..." << endl;
     cout << "=======================================" << endl;
 
-    // Ö´ĞĞÅú´¦ÀíÎÄ¼ş
+    // æ‰§è¡Œæ‰¹å¤„ç†æ–‡ä»¶
     string command = "\"" + BATCH_FILE + "\"";
     int result = system(command.c_str());
 
-    // ÇåÀíÁÙÊ±Åú´¦ÀíÎÄ¼ş
+    // æ¸…ç†ä¸´æ—¶æ‰¹å¤„ç†æ–‡ä»¶
     remove(BATCH_FILE.c_str());
 
     cout << "=======================================" << endl;
-    cout << "²Ù×÷Íê³É£¡°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥..." << endl;
+    cout << "æ“ä½œå®Œæˆï¼æŒ‰ä»»æ„é”®è¿”å›ä¸»èœå•..." << endl;
     _getch();
 }
 
 int main() {
-    // ÉèÖÃ¿ØÖÆÌ¨±àÂëÎªGBK£¨ĞŞ¸´ÖĞÎÄÏÔÊ¾ÎÊÌâ£©
+    // è®¾ç½®æ§åˆ¶å°ç¼–ç ä¸ºGBKï¼ˆä¿®å¤ä¸­æ–‡æ˜¾ç¤ºé—®é¢˜ï¼‰
     setupConsoleEncoding();
 
-    // ¼ì²éÅäÖÃÎÄ¼şÊÇ·ñ´æÔÚ£¬²»´æÔÚÔò´´½¨
+    // æ£€æŸ¥é…ç½®æ–‡ä»¶æ˜¯å¦å­˜åœ¨ï¼Œä¸å­˜åœ¨åˆ™åˆ›å»º
     if (!configExists()) {
         createConfigFile();
     }
 
-    // ¶ÁÈ¡ÅäÖÃÎÄ¼ş
+    // è¯»å–é…ç½®æ–‡ä»¶
     Config config = readConfigFile();
 
-    // Ö÷Ñ­»·
+    // ä¸»å¾ªç¯
     while (true) {
         showMainMenu();
 
-        // µÈ´ıÓÃ»§ÊäÈë
+        // ç­‰å¾…ç”¨æˆ·è¾“å…¥
         char choice;
         cin >> choice;
-        cin.ignore(); // Çå³ıÊäÈë»º³åÇø
+        cin.ignore(); // æ¸…é™¤è¾“å…¥ç¼“å†²åŒº
 
-        // ´¦ÀíÓÃ»§Ñ¡Ôñ
+        // å¤„ç†ç”¨æˆ·é€‰æ‹©
         switch (choice) {
-        case '1': // Ö´ĞĞGitÉÏ´«
+        case '1': // æ‰§è¡ŒGitä¸Šä¼ 
             executeGitCommands(config);
             break;
 
-        case '2': // ÖØĞÂÅäÖÃ
+        case '2': // é‡æ–°é…ç½®
             reconfigureGitInfo();
-            // ÖØĞÂ¶ÁÈ¡ÅäÖÃ
+            // é‡æ–°è¯»å–é…ç½®
             config = readConfigFile();
             break;
 
-        case '0': // ÍË³ö³ÌĞò
-            cout << "\n³ÌĞòÍË³ö¡£" << endl;
+        case '0': // é€€å‡ºç¨‹åº
+            cout << "\nç¨‹åºé€€å‡ºã€‚" << endl;
             return 0;
 
-        default: // ÎŞĞ§ÊäÈë
-            cout << "\nÎŞĞ§Ñ¡Ôñ£¬ÇëÖØĞÂÊäÈë£¡" << endl;
-            cout << "°´ÈÎÒâ¼ü¼ÌĞø..." << endl;
+        default: // æ— æ•ˆè¾“å…¥
+            cout << "\næ— æ•ˆé€‰æ‹©ï¼Œè¯·é‡æ–°è¾“å…¥ï¼" << endl;
+            cout << "æŒ‰ä»»æ„é”®ç»§ç»­..." << endl;
             _getch();
             break;
         }
