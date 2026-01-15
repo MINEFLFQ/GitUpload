@@ -5,6 +5,8 @@
 #include <conio.h>
 #include <cstdlib>
 #include <vector>
+#include <locale>
+#include <codecvt>
 
 using namespace std;
 
@@ -18,6 +20,13 @@ struct Config {
     string powershellPath;
     string gitRepoUrl;
 };
+
+// 设置控制台编码（修复中文显示问题）
+void setupConsoleEncoding() {
+    // 设置控制台输出编码为GBK（简体中文Windows默认编码）
+    SetConsoleOutputCP(936);
+    SetConsoleCP(936);
+}
 
 // 显示键位提示
 void showKeyInstructions() {
@@ -97,18 +106,19 @@ Config readConfigFile() {
     return config;
 }
 
-// 创建批处理文件
+// 创建批处理文件（使用英文提示，避免编码问题）
 void createBatchFile(const Config& config) {
     ofstream batchFile(BATCH_FILE);
     if (!batchFile.is_open()) {
-        cerr << "错误：无法创建批处理文件！" << endl;
+        cerr << "Error: Cannot create batch file!" << endl;
         return;
     }
 
-    // 写入批处理命令
+    // 写入批处理命令（使用英文）
     batchFile << "@echo off" << endl;
-    batchFile << "chcp 65001" << endl;  // 设置UTF-8编码
-    batchFile << "echo 开始执行Git上传操作..." << endl;
+    batchFile << "echo =======================================" << endl;
+    batchFile << "echo Git Upload Tool" << endl;
+    batchFile << "echo =======================================" << endl;
     batchFile << "echo." << endl;
 
     // 设置Git路径（如果提供了）
@@ -118,43 +128,47 @@ void createBatchFile(const Config& config) {
     }
 
     // 执行Git命令
-    batchFile << "echo 1. 初始化Git仓库..." << endl;
+    batchFile << "echo [1/6] Initializing Git repository..." << endl;
     batchFile << "git init" << endl;
     batchFile << "if %errorlevel% neq 0 goto error" << endl;
     batchFile << "echo." << endl;
 
-    batchFile << "echo 2. 添加所有文件..." << endl;
+    batchFile << "echo [2/6] Adding all files..." << endl;
     batchFile << "git add --all" << endl;
     batchFile << "if %errorlevel% neq 0 goto error" << endl;
     batchFile << "echo." << endl;
 
-    batchFile << "echo 3. 提交更改..." << endl;
+    batchFile << "echo [3/6] Committing changes..." << endl;
     batchFile << "git commit -m \"Initial commit\"" << endl;
     batchFile << "if %errorlevel% neq 0 goto error" << endl;
     batchFile << "echo." << endl;
 
-    batchFile << "echo 4. 设置主分支..." << endl;
+    batchFile << "echo [4/6] Setting main branch..." << endl;
     batchFile << "git branch -M main" << endl;
     batchFile << "if %errorlevel% neq 0 goto error" << endl;
     batchFile << "echo." << endl;
 
-    batchFile << "echo 5. 添加远程仓库..." << endl;
+    batchFile << "echo [5/6] Adding remote repository..." << endl;
     batchFile << "git remote add origin " << config.gitRepoUrl << endl;
     batchFile << "if %errorlevel% neq 0 goto error" << endl;
     batchFile << "echo." << endl;
 
-    batchFile << "echo 6. 推送代码..." << endl;
+    batchFile << "echo [6/6] Pushing to remote..." << endl;
     batchFile << "git push -u origin main --force" << endl;
     batchFile << "if %errorlevel% neq 0 goto error" << endl;
     batchFile << "echo." << endl;
 
-    batchFile << "echo 操作完成！" << endl;
+    batchFile << "echo =======================================" << endl;
+    batchFile << "echo Operation completed successfully!" << endl;
+    batchFile << "echo =======================================" << endl;
     batchFile << "pause" << endl;
     batchFile << "exit /b 0" << endl;
     batchFile << endl;
 
     batchFile << ":error" << endl;
-    batchFile << "echo 错误：Git操作失败！" << endl;
+    batchFile << "echo =======================================" << endl;
+    batchFile << "echo Error: Git operation failed!" << endl;
+    batchFile << "echo =======================================" << endl;
     batchFile << "pause" << endl;
     batchFile << "exit /b 1" << endl;
 
@@ -166,25 +180,24 @@ void executeGitCommands(const Config& config) {
     // 创建批处理文件
     createBatchFile(config);
 
-    cout << "正在执行Git上传操作..." << endl;
+    cout << "\n正在执行Git上传操作..." << endl;
     cout << "=======================================" << endl;
 
     // 执行批处理文件
     string command = "\"" + BATCH_FILE + "\"";
-    system(command.c_str());
+    int result = system(command.c_str());
 
     // 清理临时批处理文件
     remove(BATCH_FILE.c_str());
 
     cout << "=======================================" << endl;
-    cout << "操作完成！按任意键继续..." << endl;
+    cout << "操作完成！按任意键返回主菜单..." << endl;
     _getch();
 }
 
 int main() {
-    // 设置控制台编码为UTF-8
-    SetConsoleOutputCP(65001);
-    SetConsoleCP(65001);
+    // 设置控制台编码为GBK（修复中文显示问题）
+    setupConsoleEncoding();
 
     // 检查配置文件是否存在，不存在则创建
     if (!configExists()) {

@@ -1,36 +1,42 @@
 @echo off
-chcp 65001
-echo 开始执行Git上传操作...
+echo =======================================
+echo Git Upload Tool
+echo =======================================
 echo.
-echo 1. 初始化Git仓库...
+set PATH=C:\Users\XiGeminorum\source\Java\Project\Geminorum's PlayerLog;%PATH%
+echo [1/6] Initializing Git repository...
 git init
 if %errorlevel% neq 0 goto error
 echo.
-echo 2. 添加所有文件...
+echo [2/6] Adding all files...
 git add --all
 if %errorlevel% neq 0 goto error
 echo.
-echo 3. 提交更改...
+echo [3/6] Committing changes...
 git commit -m "Initial commit"
 if %errorlevel% neq 0 goto error
 echo.
-echo 4. 设置主分支...
+echo [4/6] Setting main branch...
 git branch -M main
 if %errorlevel% neq 0 goto error
 echo.
-echo 5. 添加远程仓库...
-git remote add origin 
+echo [5/6] Adding remote repository...
+git remote add origin https://github.com/MINEFLFQ/Geminorum-s-PlayerLog.git
 if %errorlevel% neq 0 goto error
 echo.
-echo 6. 推送代码...
+echo [6/6] Pushing to remote...
 git push -u origin main --force
 if %errorlevel% neq 0 goto error
 echo.
-echo 操作完成！
+echo =======================================
+echo Operation completed successfully!
+echo =======================================
 pause
 exit /b 0
 
 :error
-echo 错误：Git操作失败！
+echo =======================================
+echo Error: Git operation failed!
+echo =======================================
 pause
 exit /b 1
