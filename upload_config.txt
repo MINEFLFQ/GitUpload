@@ -1,2 +1,2 @@
-powershell_path=C:\Users\XiGeminorum\source\Java\Project\Geminorum's PlayerLog
-git_repo_url=https://github.com/MINEFLFQ/Geminorum-s-PlayerLog.git
+project_path=C:\Users\XiGeminorum\source\Java\Project\Geminorum's PlayerLog
+git_repo_url=https://github.com/MINEFLFQ/Geminorum-s-PlayerLog
